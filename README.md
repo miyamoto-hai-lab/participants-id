@@ -1,11 +1,16 @@
 # participant-id
 学術実験・クラウドソーシング実験向けの参加者ID管理ライブラリです。
-このリポジトリは、異なるフロントエンド技術（JavaScript/TypeScript, Flutter/Dart, Flet/Pythonなど）に対応するため、各環境向けのライブラリを個別に提供します。同一ドメイン内であれば、LocalStorageやそれに類するストレージ機能を利用して、参加者ごとに一意のIDを永続的に保持・管理します。
+
+このリポジトリは、異なるフロントエンド技術（JavaScript/TypeScript, Flutter, Fletなど）に対応するため、各環境向けのライブラリを個別に提供します。
+
+同一ドメイン内であれば、LocalStorageやそれに類するストレージ機能を利用して、参加者ごとに（正確にはブラウザごとに）一意のIDを永続的に保持・管理します。
+
 
 ## 目的
 - 複数の実験ページを跨いで同一の参加者を識別する。
 - 実験参加者がブラウザをリロード・再アクセスしても同じIDを保持し続ける。
 - サーバーサイドでの参加資格チェック（2回目参加の防止など）の基盤を提供する。
+
 
 ## 対応環境
 | 環境 | 言語 | 格納ディレクトリ | 使用技術/パッケージ |
@@ -28,19 +33,18 @@
 
 
 ## 仕様
-ブラウザの[ローカルストレージ](https://developer.mozilla.org/ja/docs/Web/API/Window/localStorage)に以下のようなJSONオブジェクトを保存します。
-```json
-{
-    "participant_id": "<ブラウザを一意に識別するID>",
-    "created_at": "<参加者の参加日時>",
-    "updated_at": "<参加者の最終更新日時>"
-}
-```
-`participant_id`は[UUID v7](https://tex2e.github.io/rfc-translater/html/rfc9562.html#5-7--UUID-Version-7)を採用しています。
-（例： `019ad3fd-8a80-7c0f-b719-ee5d8c6d6cf6`）
+ブラウザの[ローカルストレージ](https://developer.mozilla.org/ja/docs/Web/API/Window/localStorage)に以下のような情報を保存します。
 
-`created_at`と`updated_at`はISO 8601形式のUTCタイムスタンプです。  
-（例： `2025-11-30T09:00:00.000Z`）
+| キー | 値の例 | 説明 |
+| --- | --- | --- |
+| participant_id.browser_id | 019ad3fd-8a80-7c0f-b719-ee5d8c6d6cf6 | ブラウザを識別する固有のID(UUID v7) |
+| participant_id.created_at | 2025-11-30T09:00:00.000Z | browser_idの作成日時(ISO 8601形式のUTCタイムスタンプ) |
+| participant_id.updated_at | 2025-11-30T09:00:00.000Z | browser_idの最終更新日時(ISO 8601形式のUTCタイムスタンプ) |
+| participant_id.attributes.<app_name>.<field> | 保存可能な任意の値 | 被験者の属性データなど任意の値をアプリケーション側で保存できます。 |
+
+- ローカルストレージ上でのキーの衝突を避けるため，全てのキーにはprefix `participant_id` が付与されます。
+- 被験者の属性データの保存では，アプリケーション同士のキー名の衝突を避けるため，prefixに加えてアプリケーション名も付与されます。
+
 
 ## コードの公開について
 このリポジトリのコードには特に機密情報は含まれていませんが、宮本研究室で実施される学術実験やクラウドソーシング実験のための参加者ID管理の基盤となるものです。

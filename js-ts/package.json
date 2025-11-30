@@ -8,8 +8,8 @@
     "dist"
   ],
   "scripts": {
-    "test": "vitest run",
-    "build": "tsup",
+    "test": "vitest run tests",
+    "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],

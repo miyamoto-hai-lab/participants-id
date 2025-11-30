@@ -14,8 +14,16 @@ pip install git+https://github.com/miyamoto-hai-lab/participant-id.git#subdirect
 ```python
 from participant_id import Participant
 
+async def uuid_not_in_db(uuid: UUID) -> bool:
+    # UUIDがデータベースに存在しないことを確認する
+    if uuid in db:
+      return False
+    else:
+      return True
+
 async def main(page: ft.Page):
-    participant = Participant(page, app_name="magara_experiment1")
+    participant = Participant(page, app_name="magara_experiment1", 
+    browser_id_validation_func=uuid_not_in_db)
     browser_id = await participant.browser_id
     return ft.Text(browser_id)
 
@@ -26,6 +34,9 @@ ft.Pageオブジェクトと、実験アプリケーションの名前を引数�
 
 実験アプリケーションの名前は[attributesの保存](#被験者を識別するためのブラウザ固有のidを取得する)の際に使用されます。
 別の研究室メンバーの実験アプリケーションと区別するために、自身のニックネームを含めることを推奨します。
+
+また，`browser_id_validation_func`に任意の同期/非同期関数を渡すことで、ブラウザIDを生成した後に保存前に検証することができます。検証に成功するまでブラウザIDが繰り返し再生成されます。
+例えば，データベースに保存されているUUIDと比較して、新たに生成するブラウザIDがデータベースに存在しないことを保証するなどの用途に使用できます。
 
 ### 被験者を識別するためのブラウザ固有のIDを取得する
 各ブラウザで生成されたUUIDを取得するには、`browser_id`プロパティを用います。

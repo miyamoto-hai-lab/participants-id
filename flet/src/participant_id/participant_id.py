@@ -71,6 +71,15 @@ class Participant:
         """
         return await self.storage.get(f"{self.prefix}.updated_at")
     
+    @property
+    async def browser_id_version(self) -> Optional[int]:
+        """ブラウザIDのバージョンを取得します。
+
+        :return: 保存されていたブラウザIDのバージョン。バージョンが保存されていない場合はNone。
+        :rtype: int | None
+        """
+        return UUID(await self.browser_id).version
+    
     async def _generate_browser_id(self) -> Optional[str]:
         """UUIDv7を(再)生成してbrowser_idに保存します。
 

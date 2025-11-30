@@ -2,16 +2,17 @@
 Flutter用のライブラリです。
 
 ## インストール
-```shell
-flutter pub add participant_id
-```
-※ 現在はローカルパスまたはGit経由でのインストールを想定しています。
+`pubspec.yaml`に以下の内容を追加してください。
 ```yaml
 dependencies:
   participant_id:
     git:
       url: https://github.com/miyamoto-hai-lab/participant-id.git
       path: flutter
+```
+追加出来たら以下を実行します。
+```shell
+flutter pub get
 ```
 
 ## 使い方

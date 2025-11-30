@@ -1,14 +1,33 @@
-import { Participant } from '../dist/participant-id.mjs';
+import { AsyncParticipant, Participant } from '../dist/index.mjs';
 
-console.log('Verifying ESM build...');
-try {
-    const participant = new Participant('test_esm');
-    // In node environment without localStorage, browser_id should be null or we mock it?
-    // The library handles missing localStorage gracefully (returns null or warns).
-    // We just want to check if the class is importable and instantiable.
-    console.log('Participant instance created.');
-    console.log('ESM build verified successfully.');
-} catch (e) {
-    console.error('ESM verification failed:', e);
+// Mock localStorage
+global.window = {
+    localStorage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {}
+    }
+};
+
+// Verify Sync
+const p = new Participant('test');
+console.log('Sync Browser ID:', p.browser_id);
+
+if (p.browser_id) {
+    console.log('ESM Sync Verification Passed');
+} else {
+    console.error('ESM Sync Verification Failed');
+    process.exit(1);
+}
+
+// Verify Async
+const ap = new AsyncParticipant('test_async');
+const id = await ap.get_browser_id();
+console.log('Async Browser ID:', id);
+
+if (id) {
+    console.log('ESM Async Verification Passed');
+} else {
+    console.error('ESM Async Verification Failed');
     process.exit(1);
 }
