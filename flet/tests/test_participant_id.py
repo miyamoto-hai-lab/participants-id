@@ -73,7 +73,7 @@ async def test_delete_browser_id(mock_page):
     participant = Participant(mock_page, app_name="test_app")
     
     id1 = await participant.browser_id
-    await participant.delete_browser_id()
+    await participant._delete_browser_id()
     
     # Should be gone from storage
     assert await mock_page.client_storage.get("participant_id.browser_id") is None
