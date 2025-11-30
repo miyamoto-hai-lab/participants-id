@@ -1,4 +1,7 @@
-from typing import Any, List, Optional, Union
+from datetime import UTC, datetime
+from inspect import isawaitable
+from typing import Any, Awaitable, Callable, List, Optional, Union
+from uuid import UUID
 
 import flet as ft
 
@@ -17,7 +20,9 @@ class Participant:
     """
     Fletクライアントストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
     """
-    def __init__(self, page: ft.Page, app_name: str, prefix: str = "participant_id"):
+    MAX_RETRY_VALIDATION = 10  # ブラウザID検証の最大試行回数
+
+    def __init__(self, page: ft.Page, app_name: str, prefix: str = "participant_id", browser_id_validation_func: Optional[Callable[UUID, Union[bool, Awaitable[bool]]]] = None):
         """
         :param page: 現在のFletアプリケーションのft.Pageオブジェクト
         :type page: flet.Page   
@@ -26,10 +31,45 @@ class Participant:
         :param prefix: 他のアプリと区別するためのストレージキーのプレフィックス
             (通常は指定する必要はありません。)
         :type prefix: str
+        :param browser_id_validation_func: ブラウザIDの検証関数
+            (ブラウザIDを生成した後に保存前に呼び出されます。
+            サーバに生成されたIDの登録可否を問い合わせる用途で使用できます。)
+        :type browser_id_validation_func: Optional[Callable[uuid.UUID, Union[bool, Awaitable[bool]]]]
+            (UUIDを受け取り、受理可否をboolで返す同期/非同期関数を指定できます。)
         """
         self.storage = page.client_storage
         self.app_name = app_name
         self.prefix = prefix
+        self.browser_id_validation_func = browser_id_validation_func
+    
+    @property
+    async def browser_id(self) -> Optional[str]:
+        """ブラウザIDを取得します。
+
+        ブラウザIDがまだ存在しない時には新たに生成します。
+
+        :return: 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はNone。
+        :rtype: str | None
+        """
+        return await self.get_browser_id()
+    
+    @property
+    async def created_at(self) -> Optional[str]:
+        """ブラウザIDの生成日時を取得します。
+
+        :return: 保存されていたブラウザIDの生成日時。生成日時が保存されていない場合はNone。
+        :rtype: str | None
+        """
+        return await self.storage.get(f"{self.prefix}.created_at")
+    
+    @property
+    async def updated_at(self) -> Optional[str]:
+        """ブラウザIDの更新日時を取得します。
+
+        :return: 保存されていたブラウザIDの更新日時。更新日時が保存されていない場合はNone。
+        :rtype: str | None
+        """
+        return await self.storage.get(f"{self.prefix}.updated_at")
     
     async def _generate_browser_id(self) -> Optional[str]:
         """UUIDv7を(再)生成してbrowser_idに保存します。
@@ -40,19 +80,34 @@ class Participant:
         :return: 新しく生成されたブラウザID。保存に失敗した場合はNone。
         :rtype: str | None
         """
-        new_id = str(uuid7())
-        is_successful = await self.storage.set(f"{self.prefix}.browser_id", new_id)
-        if is_successful:
-            return new_id
-        else:
-            return None
-    
-    @property
-    async def browser_id(self) -> Optional[str]:
+        for _ in range(self.MAX_RETRY_VALIDATION):
+            new_id = str(uuid7())
+            if self.browser_id_validation_func:
+                is_valid = self.browser_id_validation_func(new_id)
+                if isawaitable(is_valid):
+                    is_valid = await is_valid
+            else:
+                is_valid = True
+            if is_valid:
+                is_successful = await self.storage.set(f"{self.prefix}.browser_id", new_id)
+                if await self.storage.contains_key_async(f"{self.prefix}.created_at"):
+                    await self.storage.set(f"{self.prefix}.updated_at", datetime.now(UTC).isoformat().replace("+00:00", "Z"))
+                    print("updated_at written", await self.storage.get(f"{self.prefix}.created_at"), type(await (self.storage.contains_key_async(f"{self.prefix}.created_at"))))
+                else:
+                    await self.storage.set(f"{self.prefix}.created_at", datetime.now(UTC).isoformat().replace("+00:00", "Z"))
+                    print("created_at written")
+                if is_successful:
+                    return new_id
+                else:
+                    return None
+            else:
+                return None
+
+    async def get_browser_id(self, generate_if_not_exists: bool = True) -> Optional[str]:
         """ブラウザIDを取得します。
 
-        ブラウザIDがまだ存在しない場合は、新たに生成します。
-
+        :param: generate_if_not_exists: Trueの場合、ブラウザIDがまだ存在しない時には新たに生成します。
+        :type: generate_if_not_exists: bool
         :return: 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はNone。
         :rtype: str | None
         """
@@ -60,15 +115,33 @@ class Participant:
         if id:
             return id
         else:
-            return await self._generate_browser_id()
+            if generate_if_not_exists:
+                return await self._generate_browser_id()
+            else:
+                return None
     
-    async def delete_browser_id(self) -> bool:
+    async def browser_id_exists(self) -> bool:
+        """ブラウザIDがストレージに存在するかを確認します。
+        
+        :return: ブラウザIDが存在する場合はTrue、それ以外はFalse
+        :rtype: bool
+        """
+        return await self.storage.contains_key(f"{self.prefix}.browser_id")
+    
+    async def _delete_browser_id(self) -> bool:
         """ブラウザIDをストレージから削除します。
+
+        [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。
+        削除は特別な事情がない限り行わないでください。
         
         :return: 削除に成功した場合はTrue、それ以外はFalse
         :rtype: bool
         """
-        return await self.storage.remove(f"{self.prefix}.browser_id")
+        is_successful = await self.storage.remove(f"{self.prefix}.browser_id")
+        if is_successful:
+            await self.storage.remove(f"{self.prefix}.created_at")
+            await self.storage.remove(f"{self.prefix}.updated_at")
+        return is_successful
     
     async def set_attribute(self, field: str, value: Union[int, float, bool, str, List[str], None]) -> bool:
         """指定されたフィールドに値を保存します。
@@ -101,6 +174,17 @@ class Participant:
             return value
         else:
             return default
+    
+    async def attributes_exists(self, field: str) -> bool:
+        """指定されたフィールドがストレージに存在するかを確認します。
+        
+        :param field: フィールド名
+        :type field: str
+        
+        :return: 属性が存在する場合はTrue、それ以外はFalse
+        :rtype: bool
+        """
+        return await self.storage.contains_key(f"{self.prefix}.{self.app_name}.{field}")
 
     async def delete_attribute(self, field: str) -> bool:
         """指定されたフィールドの値をストレージから削除します。

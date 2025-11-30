@@ -70,4 +70,4 @@ jobs:
           pip install .
       
       - name: Run Tests
-        run: pytest tests/test_participant_id.py
+        run: pytest

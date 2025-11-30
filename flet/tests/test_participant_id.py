@@ -34,13 +34,26 @@ def mock_page():
 
 @pytest.mark.asyncio
 async def test_browser_id_generation(mock_page):
-    participant = Participant(mock_page, app_name="test_app")
+    def browser_id_validation_func1(uuid):
+        return False
+    
+    async def browser_id_validation_func2(uuid):
+        return True
+
+    participant = Participant(mock_page, app_name="test_app", browser_id_validation_func=browser_id_validation_func1)
     
     # First access should generate ID
+    id1 = await participant.browser_id
+    assert id1 is None
+    participant.browser_id_validation_func = browser_id_validation_func2
     id1 = await participant.browser_id
     assert id1 is not None
     assert isinstance(id1, str)
     assert len(id1) > 0
+    # assert await participant.created_at is not None
+    # assert await participant.updated_at is None
+    # await participant._generate_browser_id()
+    # assert await participant.updated_at is not None
     
     # Check if saved to storage
     # Key should be "participant_id.browser_id"
