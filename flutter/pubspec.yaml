@@ -1,0 +1,19 @@
+name: participant_id
+description: "Browser ID generation utility for research participants in crowdsourcing experiments"
+version: 1.0.0
+homepage: "https://github.com/miyamoto-hai-lab/participant-id"
+
+environment:
+  sdk: ^3.10.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.5.3
+  uuid: ^4.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

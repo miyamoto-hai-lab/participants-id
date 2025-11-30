@@ -1,0 +1,44 @@
+[project]
+name = "participant-id"
+version = "1.0.0"
+description = "Browser ID generation utility for research participants in crowdsourcing experiments"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Keisuke Magara", email = "61485115+kei-mag@users.noreply.github.com" }
+]
+dependencies = [
+    "flet==0.28.3",
+    "uuid7",
+]
+
+[project.urls]
+Homepage = "https://github.com/miyamoto-hai-lab/participant-id"
+Documentation = "https://github.com/miyamoto-hai-lab/participant-id/blob/main/flet/README.md"
+Repository = "https://github.com/miyamoto-hai-lab/participant-id"
+Issues = "https://github.com/miyamoto-hai-lab/participant-id/issues"
+
+[tool.setuptools.package-data]
+"flutter.participant_id" = ["**/*"]
+
+[tool.uv]
+dev-dependencies = [
+    "flet[all]==0.28.3",
+    "mkdocs", 
+    "mkdocs-material",
+    "mkdocstrings[python]"
+]
+
+[tool.poetry.group.dev.dependencies]
+flet = {extras = ["all"], version = "0.28.3"}
+mkdocs = "*"
+mkdocstrings = { extras = ["python"], version = "*" }
+mkdocs-material = "*"
+
+[tool.setuptools]
+license-files = []
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
