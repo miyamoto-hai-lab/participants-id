@@ -2,14 +2,14 @@
   "name": "js-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/participant-id.js",
-  "types": "./dist/participant-id.d.ts",
+  "main": "./dist/participants-id.js",
+  "types": "./dist/participants-id.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "test": "vitest run tests",
-    "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
+    "build": "tsup src/participants-id.ts --format cjs,esm,iife --dts --clean",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],

@@ -1,4 +1,4 @@
-# Flet participant-id
+# Flet participants-id
 Flet用のライブラリです。
 
 Flet 0.28.3 に対応しています。
@@ -7,12 +7,12 @@ Flet 0.28.3 に対応しています。
 
 ## インストール
 ```shell
-pip install git+https://github.com/miyamoto-hai-lab/participant-id.git#subdirectory=flet
+pip install git+https://github.com/miyamoto-hai-lab/participants-id.git#subdirectory=flet
 ```
 
 ## 使い方
 ```python
-from participant_id import Participant
+from participants_id import Participant
 
 async def uuid_not_in_db(uuid: UUID) -> bool:
     # UUIDがデータベースに存在しないことを確認する
@@ -22,7 +22,7 @@ async def uuid_not_in_db(uuid: UUID) -> bool:
       return True
 
 async def main(page: ft.Page):
-    participant = Participant(page, app_name="magara_experiment1", 
+    participant = Participant(page, app_name="my_experiment_app", 
     browser_id_validation_func=uuid_not_in_db)
     browser_id = await participant.browser_id
     return ft.Text(browser_id)

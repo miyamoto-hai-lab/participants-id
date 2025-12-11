@@ -5,9 +5,9 @@ Flutter用のライブラリです。
 `pubspec.yaml`に以下の内容を追加してください。
 ```yaml
 dependencies:
-  participant_id:
+  participants_id:
     git:
-      url: https://github.com/miyamoto-hai-lab/participant-id.git
+      url: https://github.com/miyamoto-hai-lab/participants-id.git
       path: flutter
 ```
 追加出来たら以下を実行します。
@@ -18,7 +18,7 @@ flutter pub get
 ## 使い方
 ```dart
 import 'package:flutter/material.dart';
-import 'package:participant_id/participant_id.dart';
+import 'package:participants_id/participants_id.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
 
   Future<String?> _getBrowserId() async {
     try {
-      final participant = Participant(appName: "magara_experiment1");
+      final participant = Participant(appName: "my_experiment_app");
       return await participant.browserId;
     } catch (e) {
       debugPrint('Error getting browser ID: $e');

@@ -1,4 +1,4 @@
-const { Participant, AsyncParticipant } = require('../dist/index.js');
+const { Participant, AsyncParticipant } = require('../dist/participants-id.js');
 
 // Mock localStorage
 global.window = {

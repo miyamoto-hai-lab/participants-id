@@ -1,26 +1,33 @@
-# JS/TS ParticipantID
+# JS/TS ParticipantsID
 
 ブラウザの `localStorage` を使用して、被験者ID (`browser_id`) やその他の属性 (`attributes`) を管理するためのライブラリです。
-Python (Flet) 版の `participant_id` ライブラリと互換性のあるデータ構造を使用しています。
 
 ## インストール
 
 ### npm / yarn / pnpm (Next.js, Vue, Angular, etc.)
 GitHubリポジトリから直接インストールします。
 
-```bash
-npm install git+https://github.com/miyamoto-hai-lab/participant-id.git#subdirectory=js-ts
+```shell
+npm install git+https://github.com/miyamoto-hai-lab/participants-id.git#subdirectory=js-ts
+```
+または
+```shell
+yarn add git+https://github.com/miyamoto-hai-lab/participants-id.git#subdirectory=js-ts
+```
+または
+```shell
+pnpm add git+https://github.com/miyamoto-hai-lab/participants-id.git#subdirectory=js-ts
 ```
 
 ### Vanilla JS (HTML + JS)
-[Releases](https://github.com/miyamoto-hai-lab/participant-id/releases) ページから `participant-id.global.js` をダウンロードし、プロジェクトに配置してください。
+[最新のリリース](https://github.com/miyamoto-hai-lab/participants-id/releases/latest) ページから `participants-id.global.js` をダウンロードし、プロジェクトに配置してください。
 
 ## 使い方
 
 ### Vanilla JS (HTML + Script Tag)
 
-ダウンロードした `participant-id.global.js` を読み込みます。
-`ParticipantIdLib` というグローバル変数経由でアクセスできます。
+ダウンロードした `participants-id.global.js` を読み込みます。
+`ParticipantsIdLib` というグローバル変数経由でアクセスできます。
 
 ```html
 <!DOCTYPE html>
@@ -28,13 +35,13 @@ npm install git+https://github.com/miyamoto-hai-lab/participant-id.git#subdirect
 <head>
     <meta charset="UTF-8">
     <title>Experiment</title>
-    <script src="participant-id.global.js"></script>
+    <script src="participants-id.global.js"></script>
 </head>
 <body>
     <div id="id-display"></div>
     <script>
         // インスタンス化 (アプリ名を指定)
-        const participant = new ParticipantIdLib.Participant("my_experiment_app");
+        const participant = new ParticipantsIdLib.Participant("my_experiment_app");
 
         // browser_id の取得
         const browserId = participant.browser_id;
@@ -53,7 +60,7 @@ npm install git+https://github.com/miyamoto-hai-lab/participant-id.git#subdirect
 "use client"; // Next.js App Routerの場合
 
 import { useEffect, useState } from 'react';
-import { Participant } from 'participant-id'; // パッケージ名は package.json の name に依存しますが、git install の場合はそのエイリアスになります
+import { Participant } from 'participants-id'; // パッケージ名は package.json の name に依存しますが、git install の場合はそのエイリアスになります
 
 export default function Page() {
   const [browserId, setBrowserId] = useState<string | null>(null);
@@ -73,10 +80,10 @@ export default function Page() {
 
 ### Vue.js
 
-```vue
+```typescript
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { Participant } from 'participant-id';
+import { Participant } from 'participants-id';
 
 const browserId = ref<string | null>(null);
 
@@ -95,7 +102,7 @@ onMounted(() => {
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { Participant } from 'participant-id';
+import { Participant } from 'participants-id';
 
 @Component({
   selector: 'app-root',
@@ -114,19 +121,29 @@ export class AppComponent implements OnInit {
 
 ## API
 
-### `new Participant(app_name: string, prefix?: string)`
-- `app_name`: アプリケーション名。属性データの保存キーに含まれます。
-- `prefix`: ストレージキーのプレフィックス。デフォルトは `"participant_id"`。
+### Particiapntオブジェクトを生成する
+```typescript
+Participant(app_name: string, prefix?: string)
+```
+- `app_name`: アプリケーション名。[属性データの保存]()キーに含まれます。例：`"my_experiment_app"`
+- `prefix`: ストレージキーのプレフィックス。デフォルトは `"participants_id"`。
 
-### `browser_id: string | null`
-- ブラウザ固有のUUID (v7) を取得します。v7の生成に失敗した場合はv4を使用します。存在しない場合は自動生成して保存します。
+### 被験者を識別するためのブラウザ固有のIDを取得する
+各ブラウザで生成されたUUIDを取得するには、`browser_id`プロパティを用います。
+```typescript
+participant.browser_id
+```
+上記を実行すると、各ブラウザのローカルストレージ（SharedPreferences）に保存されたUUID (v7) が取得できます。
+被験者が初めて実験ページにアクセスし、まだローカルストレージにIDがない場合には、新たにUUIDを生成して保存し、返します。
 
-### `set_attribute(field: string, value: any): void`
-- 指定したフィールドに値を保存します。
-- 保存先キー: `participant_id.<app_name>.<field>`
+v7の生成に失敗した場合はv4を使用してbrowser_idを生成します。
 
-### `get_attribute(field: string, defaultValue?: any): any`
-- 指定したフィールドの値を取得します。
+### 被験者に関する他の情報を保存・取得する
+このライブラリでは、ブラウザIDだけでなく、被験者のクラウドソーシングIDや年齢、性別など他の情報も保存・取得することができます。
+```typescript
+participant.set_attribute(field: string, value: any)
+participant.get_attribute(field: string, defaultValue?: any)
+```
+上記を実行すると、ローカルストレージにクラウドワーカーIDを保存・取得できます。
 
-### `delete_attribute(field: string): void`
-- 指定したフィールドの値を削除します。
+例えば、[クラウドワークス](https://crowdworks.jp/)上で実験を実施する場合、各被験者のクラウドワークスIDを訊いてattributeとして保存しておくことで、ブラウザを変えて被験者が実験に複数回参加しようとした場合に同一被験者を識別することができます。

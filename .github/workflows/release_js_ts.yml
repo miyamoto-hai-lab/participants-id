@@ -45,3 +45,4 @@ jobs:
             js-ts/dist/participants-id.mjs
             js-ts/dist/participants-id.global.js
             js-ts/dist/participants-id.d.ts
+            js-ts/dist/participants-id.d.mts

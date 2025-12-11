@@ -2,10 +2,10 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: {
-    'participant-id': 'src/index.ts',
+    'participants-id': 'src/participants-id.ts',
   },
   format: ['cjs', 'esm', 'iife'],
-  globalName: 'ParticipantIdLib',
+  globalName: 'ParticipantsIdLib',
   dts: true,
   clean: true,
 })

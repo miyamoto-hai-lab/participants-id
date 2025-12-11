@@ -1,6 +1,6 @@
 import { validate as uuidValidate, version as uuidVersion } from 'uuid';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AsyncParticipant, Participant } from '../src/index';
+import { AsyncParticipant, Participant } from '../src/participants-id';
 
 describe('Participant (Sync)', () => {
     beforeEach(() => {

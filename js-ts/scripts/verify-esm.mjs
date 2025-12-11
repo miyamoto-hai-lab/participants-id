@@ -1,4 +1,4 @@
-import { AsyncParticipant, Participant } from '../dist/index.mjs';
+import { AsyncParticipant, Participant } from '../dist/participants-id.mjs';
 
 // Mock localStorage
 global.window = {
