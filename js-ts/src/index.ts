@@ -235,7 +235,7 @@ export class AsyncParticipant {
      */
     constructor(
         app_name: string,
-        prefix: string = "participant_id",
+        prefix: string = "participants_id",
         browser_id_validation_func: ((id: string) => boolean | Promise<boolean>) | null = null
     ) {
         this.app_name = app_name;

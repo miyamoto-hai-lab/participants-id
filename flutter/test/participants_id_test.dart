@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:participant_id/participant_id.dart';
+import 'package:participants_id/participants_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -7,7 +7,7 @@ void main() {
 
   group('Participant', () {
     const String appName = 'test_app';
-    const String prefix = 'participant_id';
+    const String prefix = 'participants_id';
 
     setUp(() {
       SharedPreferences.setMockInitialValues({});

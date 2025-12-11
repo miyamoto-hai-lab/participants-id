@@ -20,7 +20,7 @@ describe('Participant (Sync)', () => {
         expect(id).toBeDefined();
         expect(uuidValidate(id!)).toBe(true);
         expect(uuidVersion(id!)).toBe(7);
-        expect(localStorage.getItem('participant_id.browser_id')).toBe(id);
+        expect(localStorage.getItem('participants_id.browser_id')).toBe(id);
     });
 
     it('should validate browser_id with synchronous function', () => {
@@ -62,7 +62,7 @@ describe('AsyncParticipant (Async)', () => {
         expect(id).toBeDefined();
         expect(uuidValidate(id!)).toBe(true);
         expect(uuidVersion(id!)).toBe(7);
-        expect(localStorage.getItem('participant_id.browser_id')).toBe(id);
+        expect(localStorage.getItem('participants_id.browser_id')).toBe(id);
     });
 
     it('should validate browser_id with async function', async () => {
@@ -96,7 +96,7 @@ describe('AsyncParticipant (Async)', () => {
         expect(createdAt).toBeDefined();
         
         // Simulate update
-        localStorage.removeItem('participant_id.browser_id');
+        localStorage.removeItem('participants_id.browser_id');
         const id2 = await participant.get_browser_id();
         const updatedAt = await participant.get_updated_at();
         expect(updatedAt).toBeDefined();

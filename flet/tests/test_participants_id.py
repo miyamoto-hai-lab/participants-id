@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from participant_id import Participant
+from participants_id import Participant
 
 import flet as ft
 
@@ -56,8 +56,8 @@ async def test_browser_id_generation(mock_page):
     # assert await participant.updated_at is not None
     
     # Check if saved to storage
-    # Key should be "participant_id.browser_id"
-    assert await mock_page.client_storage.get("participant_id.browser_id") == id1
+    # Key should be "participants_id.browser_id"
+    assert await mock_page.client_storage.get("participants_id.browser_id") == id1
 
 @pytest.mark.asyncio
 async def test_browser_id_persistence(mock_page):
@@ -76,7 +76,7 @@ async def test_delete_browser_id(mock_page):
     await participant._delete_browser_id()
     
     # Should be gone from storage
-    assert await mock_page.client_storage.get("participant_id.browser_id") is None
+    assert await mock_page.client_storage.get("participants_id.browser_id") is None
     
     # Next access should generate new ID
     id2 = await participant.browser_id
@@ -90,8 +90,8 @@ async def test_attributes(mock_page):
     val = await participant.get_attribute("attr1")
     assert val == "value1"
     
-    # Check storage key: "participant_id.test_app.attr1"
-    assert await mock_page.client_storage.get("participant_id.test_app.attr1") == "value1"
+    # Check storage key: "participants_id.test_app.attr1"
+    assert await mock_page.client_storage.get("participants_id.test_app.attr1") == "value1"
 
 @pytest.mark.asyncio
 async def test_attribute_types(mock_page):
