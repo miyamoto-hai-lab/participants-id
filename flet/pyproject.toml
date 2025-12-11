@@ -1,5 +1,5 @@
 [project]
-name = "participant-id"
+name = "participants-id"
 version = "1.0.0"
 description = "Browser ID generation utility for research participants in crowdsourcing experiments"
 readme = "README.md"
@@ -14,10 +14,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/miyamoto-hai-lab/participant-id"
-Documentation = "https://github.com/miyamoto-hai-lab/participant-id/blob/main/flet/README.md"
-Repository = "https://github.com/miyamoto-hai-lab/participant-id"
-Issues = "https://github.com/miyamoto-hai-lab/participant-id/issues"
+Homepage = "https://github.com/miyamoto-hai-lab/participants-id"
+Documentation = "https://github.com/miyamoto-hai-lab/participants-id/blob/main/flet/README.md"
+Repository = "https://github.com/miyamoto-hai-lab/participants-id"
+Issues = "https://github.com/miyamoto-hai-lab/participants-id/issues"
 
 [tool.setuptools.package-data]
 "flutter.participant_id" = ["**/*"]

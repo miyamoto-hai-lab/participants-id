@@ -22,7 +22,7 @@ class Participant:
     """
     MAX_RETRY_VALIDATION = 10  # ブラウザID検証の最大試行回数
 
-    def __init__(self, page: ft.Page, app_name: str, prefix: str = "participant_id", browser_id_validation_func: Optional[Callable[UUID, Union[bool, Awaitable[bool]]]] = None):
+    def __init__(self, page: ft.Page, app_name: str, prefix: str = "participants_id", browser_id_validation_func: Optional[Callable[UUID, Union[bool, Awaitable[bool]]]] = None):
         """
         :param page: 現在のFletアプリケーションのft.Pageオブジェクト
         :type page: flet.Page   

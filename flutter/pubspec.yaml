@@ -1,7 +1,7 @@
-name: participant_id
+name: participants_id
 description: "Browser ID generation utility for research participants in crowdsourcing experiments"
 version: 1.0.0
-homepage: "https://github.com/miyamoto-hai-lab/participant-id"
+homepage: "https://github.com/miyamoto-hai-lab/participants-id"
 
 environment:
   sdk: ^3.10.1

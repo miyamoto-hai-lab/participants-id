@@ -19,7 +19,7 @@ class Participant {
   /// (UUIDを受け取り、受理可否をboolで返す非同期関数を指定できます。)
   Participant({
     required this.appName,
-    this.prefix = "participant_id",
+    this.prefix = "participants_id",
     this.browserIdValidationFunc,
   });
 

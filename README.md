@@ -1,9 +1,9 @@
-# participant-id
+# participants-id
 クラウドソーシング実験向けの参加者ID管理ライブラリです。
 
 同一ドメイン内であれば、LocalStorageやそれに類するストレージ機能を利用して、参加者ごとに（正確にはブラウザごとに）一意のIDを永続的に保持・管理します。
 
-このリポジトリは、異なるフロントエンド技術（JavaScript/TypeScript, Flutter, Fletなど）に対応するため、各環境向けのライブラリを個別に提供します。
+このリポジトリは、異なるフロントエンド技術（JavaScript / TypeScript, Flutter, Fletなど）に対応するため、各環境向けのライブラリを個別に提供します。
 
 
 ## 目的
@@ -15,9 +15,9 @@
 ## 対応環境
 | 環境 | 言語 | 格納ディレクトリ | 使用技術/パッケージ |
 | --- | --- | --- | --- |
-| Web (Vanilla JS, Next.js, React, Vue, Svelte) | JavaScript / TypeScript | /js-ts | LocalStorage API |
-| Flutter (Mobile, Web, Desktop) | Dart | /flutter | shared_preferences パッケージ |
-| Flet (Web, Desktop, Mobile) | Python | /flet | page.client_storage |
+| Web (Vanilla JS, Next.js, React, Vue, Svelte) | JavaScript / TypeScript | [js-ts/](js-ts/) | LocalStorage API |
+| Flutter (Mobile, Web, Desktop) | Dart | [flutter/](flutter/) | shared_preferences パッケージ |
+| Flet (Web, Desktop, Mobile) | Python | [flet/](flet/) | page.client_storage |
 
 ## 使い方
 各環境のディレクトリ内に、詳細な導入手順と使用例を記載した `README.md` があります。

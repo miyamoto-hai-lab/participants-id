@@ -1,4 +1,4 @@
-# Flutter participant-id
+# Flutter participants-id
 Flutter用のライブラリです。
 
 ## インストール

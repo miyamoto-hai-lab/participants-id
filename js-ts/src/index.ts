@@ -21,7 +21,7 @@ export class Participant {
      */
     constructor(
         app_name: string,
-        prefix: string = "participant_id",
+        prefix: string = "participants_id",
         browser_id_validation_func: ((id: string) => boolean) | null = null
     ) {
         this.app_name = app_name;
@@ -130,6 +130,16 @@ export class Participant {
     }
 
     /**
+     * ブラウザIDがストレージに存在するかを確認します。
+     * 
+     * @returns ブラウザIDが存在する場合はTrue、それ以外はFalse
+     */
+    public browser_id_exists(): boolean {
+        if (!this.storage) return false;
+        return this.storage.getItem(`${this.prefix}.browser_id`) !== null;
+    }
+
+    /**
      * ブラウザIDをストレージから削除します。
      * 
      * [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。
@@ -180,6 +190,17 @@ export class Participant {
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * 指定されたフィールドがストレージに存在するかを確認します。
+     * 
+     * @param field フィールド名
+     * @returns 属性が存在する場合はTrue、それ以外はFalse
+     */
+    public attributes_exists(field: string): boolean {
+        if (!this.storage) return false;
+        return this.storage.getItem(`${this.prefix}.${this.app_name}.${field}`) !== null;
     }
 
     /**
@@ -323,6 +344,16 @@ export class AsyncParticipant {
     }
 
     /**
+     * ブラウザIDがストレージに存在するかを確認します。
+     * 
+     * @returns ブラウザIDが存在する場合はTrue、それ以外はFalse
+     */
+    public async browser_id_exists(): Promise<boolean> {
+        if (!this.storage) return false;
+        return this.storage.getItem(`${this.prefix}.browser_id`) !== null;
+    }
+
+    /**
      * ブラウザIDをストレージから削除します。
      * 
      * [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。
@@ -373,6 +404,17 @@ export class AsyncParticipant {
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * 指定されたフィールドがストレージに存在するかを確認します。
+     * 
+     * @param field フィールド名
+     * @returns 属性が存在する場合はTrue、それ以外はFalse
+     */
+    public async attributes_exists(field: string): Promise<boolean> {
+        if (!this.storage) return false;
+        return this.storage.getItem(`${this.prefix}.${this.app_name}.${field}`) !== null;
     }
 
     /**
