@@ -1,5 +1,48 @@
 import { v7 as uuidv7, validate as uuidValidate, version as uuidVersion } from 'uuid';
 
+// --- Helper: UUID v7 Generator with Fallback ---
+/**
+ * cryptoが利用可能な場合はuuidパッケージを使用し、
+ * 利用できない場合（HTTP環境など）はMath.random()でフォールバックします。
+ */
+function generate_uuidv7(): string {
+    try {
+        // cryptoが利用可能かチェックしてから呼び出す
+        if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+             return uuidv7();
+        }
+        // Node.js環境などの場合 (通常uuidパッケージが処理するが念のため)
+        if (typeof global !== 'undefined' && global.crypto) {
+             return uuidv7();
+        }
+    } catch (e) {
+        // 無視してフォールバックへ
+    }
+
+    // --- Fallback Implementation (Math.random) ---
+    const timestamp = Date.now();
+    
+    // Timestamp (48 bits)
+    const tsHex = timestamp.toString(16).padStart(12, '0');
+    
+    // random_a (12 bits)
+    const randA = Math.floor(Math.random() * 0xFFF).toString(16).padStart(3, '0');
+    
+    // random_b (62 bits) - 分割して生成
+    // Variant (2 bits) は 10xx なので、最初のHexは 8, 9, a, b のいずれか
+    const variantChars = ['8', '9', 'a', 'b'];
+    const variant = variantChars[Math.floor(Math.random() * 4)];
+    
+    const randB_1 = Math.floor(Math.random() * 0xFFF).toString(16).padStart(3, '0'); // remaining 12 bits of high part
+    const randB_2 = Math.floor(Math.random() * 0xFFFFFFFFFFFF).toString(16).padStart(12, '0'); // low 48 bits (JSのNumberは53bit精度なので安全)
+
+    // Format: 8-4-4-4-12
+    // TTTTTTTT-TTTT-7AAA-VBBB-BBBBBBBBBBBB
+    return `${tsHex.substring(0, 8)}-${tsHex.substring(8, 12)}-7${randA}-${variant}${randB_1}-${randB_2}`;
+}
+
+
+
 // --- Synchronous Participant ---
 /**
  * ブラウザのローカルストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
@@ -44,13 +87,13 @@ export class Participant {
      * 
      * @returns 新しく生成されたブラウザID。保存に失敗した場合はnull。
      */
-    private _generate_browser_id(): string | null {
+    public _generate_browser_id(): string | null {
         if (!this.storage) return null;
 
         for (let i = 0; i < this.MAX_RETRY_VALIDATION; i++) {
             let newId: string;
             try {
-                newId = uuidv7();
+                newId = generate_uuidv7();
             } catch (e) {
                 console.error("Failed to generate UUID v7", e);
                 return null;
@@ -258,13 +301,13 @@ export class AsyncParticipant {
      * 
      * @returns 新しく生成されたブラウザID。保存に失敗した場合はnull。
      */
-    private async _generate_browser_id(): Promise<string | null> {
+    public async _generate_browser_id(): Promise<string | null> {
         if (!this.storage) return null;
 
         for (let i = 0; i < this.MAX_RETRY_VALIDATION; i++) {
             let newId: string;
             try {
-                newId = uuidv7();
+                newId = generate_uuidv7();
             } catch (e) {
                 console.error("Failed to generate UUID v7", e);
                 return null;
