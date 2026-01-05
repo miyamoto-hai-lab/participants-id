@@ -141,16 +141,13 @@ void main() {
       expect(() async => await participant.browserId, throwsException);
     });
     
-    test('getBrowserId with generateIfNotExists=false', () async {
+    test('getBrowserId', () async {
       final participant = Participant(appName: appName);
       // Ensure clean state
       await participant.deleteBrowserId();
       
-      final id = await participant.getBrowserId(generateIfNotExists: false);
-      expect(id, isEmpty);
-      
-      final id2 = await participant.getBrowserId(generateIfNotExists: true);
-      expect(id2, isNotEmpty);
+      final id = await participant.getBrowserId();
+      expect(id, isNotEmpty);
     });
     
     test('browserIdExists works', () async {
