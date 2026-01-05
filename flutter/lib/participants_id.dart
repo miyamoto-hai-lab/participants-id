@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('participants_id');
 
 /// Fletクライアントストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
 class Participant {
@@ -35,7 +38,6 @@ class Participant {
       final prefs = await SharedPreferences.getInstance();
       
       for (int i = 0; i < MAX_RETRY_VALIDATION; i++) {
-        // uuid v4.x supports v7 directly
         final newId = _uuid.v7();
         
         bool isValid = true;
@@ -58,6 +60,7 @@ class Participant {
           if (!success) {
             throw Exception('Failed to save browser_id to SharedPreferences');
           }
+          _log.info("Browser ID generated: $newId");
           return newId;
         }
       }
@@ -85,21 +88,20 @@ class Participant {
 
   /// ブラウザIDを取得します。
   ///
-  /// [generateIfNotExists] Trueの場合、ブラウザIDがまだ存在しない時には新たに生成します。
+  /// ブラウザIDがまだ存在しない場合は、新たに生成します。
   ///
-  /// Returns: 保存されていたブラウザID、または生成された新しいブラウザID。生成しない設定で存在しない場合は空文字列。
-  Future<String> getBrowserId({bool generateIfNotExists = true}) async {
+  /// Returns: 保存されていたブラウザID、または生成された新しいブラウザID。
+  /// Throws: [Exception] 取得または生成に失敗した場合。
+  Future<String> getBrowserId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final id = prefs.getString('$prefix.browser_id');
       if (id != null) {
+        _log.info("Browser ID found: $id");
         return id;
       } else {
-        if (generateIfNotExists) {
-          return await _generateBrowserId();
-        } else {
-          return "";
-        }
+        _log.info("Browser ID not found, generating new ID...");
+        return await _generateBrowserId();
       }
     } catch (e) {
       throw Exception('Failed to get browser_id: $e');
@@ -157,13 +159,12 @@ class Participant {
         await prefs.remove('$prefix.updated_at');
       }
       if (!success) {
-         // Note: remove returns true if the key was removed or didn't exist.
-         // It returns false only on failure (e.g. disk error).
          throw Exception('Failed to remove browser_id from SharedPreferences');
       }
     } catch (e) {
       throw Exception('Failed to delete browser_id: $e');
     }
+    _log.shout("Browser ID was deleted!");
   }
 
   /// 指定されたフィールドに値を保存します。
@@ -259,6 +260,8 @@ class Participant {
       final success = await prefs.remove('$prefix.$appName.$field');
       if (!success) {
         throw Exception('Failed to remove attribute $field from SharedPreferences');
+      } else {
+        _log.info("Attribute $field was deleted.");
       }
     } catch (e) {
       throw Exception('Failed to delete attribute $field: $e');

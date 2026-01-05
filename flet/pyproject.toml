@@ -1,6 +1,6 @@
 [project]
 name = "participants-id"
-version = "1.0.0"
+version = "1.2.1"
 description = "Browser ID generation utility for research participants in crowdsourcing experiments"
 readme = "README.md"
 license = "MIT"

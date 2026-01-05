@@ -1,16 +1,21 @@
 {
   "name": "participants-id",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "description": "Browser ID generation utility for research participants in crowdsourcing experiments",
-  "main": "js-ts/src/participants-id.ts",
+  "main": "./dist/participants-id.js",
+  "types": "./dist/participants-id.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run tests",
+    "build": "tsup src/participants-id.ts --format cjs,esm,iife --dts --clean",
+    "prepublishOnly": "npm run build"
+  },
   "keywords": [],
   "author": "Keisuke Magara",
   "license": "MIT",
   "type": "commonjs",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/miyamoto-hai-lab/participants-id.git"
-  },
   "dependencies": {
     "uuid": "^13.0.0"
   },

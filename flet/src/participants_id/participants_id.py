@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from inspect import isawaitable
+from logging import getLogger
 from typing import Any, Awaitable, Callable, List, Optional, Union
 from uuid import UUID
 
@@ -15,6 +16,8 @@ except ImportError:
     except ImportError as e:
         e.add_note("pip install uuid7 を実行してパッケージをインストールしてください。")
         raise e
+
+logger = getLogger(__name__)
 
 class Participant:
     """
@@ -89,6 +92,7 @@ class Participant:
         :return: 新しく生成されたブラウザID。保存に失敗した場合はNone。
         :rtype: str | None
         """
+        logger.info("Generating new browser ID...")
         for _ in range(self.MAX_RETRY_VALIDATION):
             new_id = str(uuid7())
             if self.browser_id_validation_func:
@@ -101,33 +105,36 @@ class Participant:
                 is_successful = await self.storage.set(f"{self.prefix}.browser_id", new_id)
                 if await self.storage.contains_key_async(f"{self.prefix}.created_at"):
                     await self.storage.set(f"{self.prefix}.updated_at", datetime.now(UTC).isoformat().replace("+00:00", "Z"))
-                    print("updated_at written", await self.storage.get(f"{self.prefix}.created_at"), type(await (self.storage.contains_key_async(f"{self.prefix}.created_at"))))
+                    logger.debug("updated_at written", await self.storage.get(f"{self.prefix}.created_at"), type(await (self.storage.contains_key_async(f"{self.prefix}.created_at"))))
                 else:
                     await self.storage.set(f"{self.prefix}.created_at", datetime.now(UTC).isoformat().replace("+00:00", "Z"))
-                    print("created_at written")
+                    logger.debug("created_at written")
                 if is_successful:
+                    logger.info("Browser ID generated: ", new_id)
                     return new_id
                 else:
+                    logger.error("Failed to save browser_id to localStorage")
                     return None
             else:
+                logger.error("Failed to generate valid browser ID after maximum retries")
                 return None
 
-    async def get_browser_id(self, generate_if_not_exists: bool = True) -> Optional[str]:
+    async def get_browser_id(self) -> Optional[str]:
         """ブラウザIDを取得します。
 
-        :param: generate_if_not_exists: Trueの場合、ブラウザIDがまだ存在しない時には新たに生成します。
-        :type: generate_if_not_exists: bool
+        ブラウザIDがまだ存在しない時には新たに生成します。
+
         :return: 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はNone。
         :rtype: str | None
         """
+        logger.info("Getting browser ID...")
         id = await self.storage.get(f"{self.prefix}.browser_id")
         if id:
+            logger.info("Browser ID found: ", id)
             return id
         else:
-            if generate_if_not_exists:
-                return await self._generate_browser_id()
-            else:
-                return None
+            logger.info("Browser ID not found, generating new browser ID...")
+            return await self._generate_browser_id()
     
     async def browser_id_exists(self) -> bool:
         """ブラウザIDがストレージに存在するかを確認します。
@@ -150,6 +157,9 @@ class Participant:
         if is_successful:
             await self.storage.remove(f"{self.prefix}.created_at")
             await self.storage.remove(f"{self.prefix}.updated_at")
+            logger.warning("Browser ID was deleted!")
+        else:
+            logger.error("Failed to delete browser ID")
         return is_successful
     
     async def set_attribute(self, field: str, value: Union[int, float, bool, str, List[str], None]) -> bool:
@@ -182,6 +192,7 @@ class Participant:
         if value:
             return value
         else:
+            logger.info(f"Attribute {field} does not exist, returning default value")
             return default
     
     async def attributes_exists(self, field: str) -> bool:
@@ -204,4 +215,5 @@ class Participant:
         :return: 削除に成功した場合はTrue、それ以外はFalse
         :rtype: bool
         """
+        logger.info(f"Deleting attribute {field}")
         return await self.storage.remove(f"{self.prefix}.{self.app_name}.{field}")
