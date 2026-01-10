@@ -1,4 +1,4 @@
-import { AsyncParticipant, Participant } from '../dist/participants-id.mjs';
+import { AsyncBrowser, Browser } from '../dist/browser-id.mjs';
 
 // Mock localStorage
 global.window = {
@@ -10,10 +10,10 @@ global.window = {
 };
 
 // Verify Sync
-const p = new Participant('test');
-console.log('Sync Browser ID:', p.browser_id);
+const b = new Browser('test');
+console.log('Sync Browser ID:', b.id);
 
-if (p.browser_id) {
+if (b.id) {
     console.log('ESM Sync Verification Passed');
 } else {
     console.error('ESM Sync Verification Failed');
@@ -21,8 +21,8 @@ if (p.browser_id) {
 }
 
 // Verify Async
-const ap = new AsyncParticipant('test_async');
-const id = await ap.get_browser_id();
+const ab = new AsyncBrowser('test_async');
+const id = await ab.get_id();
 console.log('Async Browser ID:', id);
 
 if (id) {

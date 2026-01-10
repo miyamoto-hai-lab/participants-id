@@ -1,4 +1,9 @@
-# participants-id
+# Browser ID ライブラリ
+
+**日本語** | [English](README_en.md)
+&emsp;&emsp;
+[![tests status](https://github.com/miyamoto-hai-lab/browser-id/actions/workflows/ci.yml/badge.svg)](https://github.com/miyamoto-hai-lab/browser-id/actions/workflows/ci.yml)
+
 クラウドソーシング実験向けの参加者ID管理ライブラリです。
 
 同一ドメイン内であれば、LocalStorageやそれに類するストレージ機能を利用して、参加者ごとに（正確にはブラウザごとに）一意のIDを永続的に保持・管理します。
@@ -37,10 +42,10 @@
 
 | キー | 値の例 | 説明 |
 | --- | --- | --- |
-| participant_id.browser_id | 019ad3fd-8a80-7c0f-b719-ee5d8c6d6cf6 | ブラウザを識別する固有のID(UUID v7) |
-| participant_id.created_at | 2025-11-30T09:00:00.000Z | browser_idの作成日時(ISO 8601形式のUTCタイムスタンプ) |
-| participant_id.updated_at | 2025-11-30T09:00:00.000Z | browser_idの最終更新日時(ISO 8601形式のUTCタイムスタンプ) |
-| participant_id.attributes.<app_name>.\<field\> | 保存可能な任意の値 | 被験者の属性データなど任意の値をアプリケーション側で保存できます。 |
+| browser_id_lib.browser_id | 019ad3fd-8a80-7c0f-b719-ee5d8c6d6cf6 | ブラウザを識別する固有のID(UUID v7) |
+| browser_id_lib.created_at | 2025-11-30T09:00:00.000Z | browser_idの作成日時(ISO 8601形式のUTCタイムスタンプ) |
+| browser_id_lib.updated_at | 2025-11-30T09:00:00.000Z | browser_idの最終更新日時(ISO 8601形式のUTCタイムスタンプ) |
+| browser_id_lib.attributes.<app_name>.\<field\> | 保存可能な任意の値 | 被験者の属性データなど任意の値をアプリケーション側で保存できます。 |
 
-- ローカルストレージ上でのキーの衝突を避けるため，全てのキーにはprefix `participant_id` が付与されます。
+- ローカルストレージ上でのキーの衝突を避けるため，全てのキーにはprefix `browser_id_lib` が付与されます。
 - 被験者の属性データの保存では，アプリケーション同士のキー名の衝突を避けるため，prefixに加えてアプリケーション名も付与されます。

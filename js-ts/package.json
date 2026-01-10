@@ -1,26 +1,24 @@
 {
-  "name": "participants-id",
-  "version": "1.1.1",
+  "name": "browser-id",
+  "version": "1.0.0",
   "description": "Browser ID generation utility for research participants in crowdsourcing experiments",
-  "main": "./dist/participants-id.js",
-  "types": "./dist/participants-id.d.ts",
+  "main": "./dist/browser-id.js",
+  "types": "./dist/browser-id.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "test": "vitest run tests",
-    "build": "tsup src/participants-id.ts --format cjs,esm,iife --dts --clean",
+    "build": "tsup src/browser-id.ts --format cjs,esm,iife --dts --clean",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": ["utility", "localstorage", "crowdsourcing", "research-tools", "uuidv7", "browser-id"],
   "author": "Keisuke Magara",
   "license": "MIT",
   "type": "commonjs",
-  "dependencies": {
-    "uuid": "^13.0.0"
-  },
   "devDependencies": {
     "@types/uuid": "^10.0.0",
+    "uuid": "^13.0.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

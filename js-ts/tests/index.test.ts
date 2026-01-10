@@ -1,8 +1,8 @@
 import { validate as uuidValidate, version as uuidVersion } from 'uuid';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AsyncParticipant, Participant } from '../src/participants-id';
+import { AsyncBrowser, Browser } from '../src/browser-id';
 
-describe('Participant (Sync)', () => {
+describe('Browser (Sync)', () => {
     beforeEach(() => {
         const store: Record<string, string> = {};
         vi.stubGlobal('localStorage', {
@@ -15,18 +15,18 @@ describe('Participant (Sync)', () => {
     });
 
     it('should generate a browser_id if none exists', () => {
-        const participant = new Participant('test_app');
-        const id = participant.browser_id;
+        const browser = new Browser('test_app');
+        const id = browser.id;
         expect(id).toBeDefined();
         expect(uuidValidate(id!)).toBe(true);
         expect(uuidVersion(id!)).toBe(7);
-        expect(localStorage.getItem('participants_id.browser_id')).toBe(id);
+        expect(localStorage.getItem('browser_id_lib.browser_id')).toBe(id);
     });
 
     it('should validate browser_id with synchronous function', () => {
         const validationFunc = vi.fn((id: string) => true);
-        const participant = new Participant('test_app', 'p', validationFunc);
-        const id = participant.browser_id;
+        const browser = new Browser('test_app', 'p', validationFunc);
+        const id = browser.id;
         expect(validationFunc).toHaveBeenCalled();
         expect(id).toBeDefined();
     });
@@ -37,14 +37,14 @@ describe('Participant (Sync)', () => {
             attempts++;
             return attempts > 2;
         });
-        const participant = new Participant('test_app', 'p', validationFunc);
-        const id = participant.browser_id;
+        const browser = new Browser('test_app', 'p', validationFunc);
+        const id = browser.id;
         expect(validationFunc).toHaveBeenCalledTimes(3);
         expect(id).toBeDefined();
     });
 });
 
-describe('AsyncParticipant (Async)', () => {
+describe('AsyncBrowser (Async)', () => {
     beforeEach(() => {
         const store: Record<string, string> = {};
         vi.stubGlobal('localStorage', {
@@ -57,12 +57,12 @@ describe('AsyncParticipant (Async)', () => {
     });
 
     it('should generate a browser_id asynchronously', async () => {
-        const participant = new AsyncParticipant('test_app');
-        const id = await participant.get_browser_id();
+        const browser = new AsyncBrowser('test_app');
+        const id = await browser.get_id();
         expect(id).toBeDefined();
         expect(uuidValidate(id!)).toBe(true);
         expect(uuidVersion(id!)).toBe(7);
-        expect(localStorage.getItem('participants_id.browser_id')).toBe(id);
+        expect(localStorage.getItem('browser_id_lib.browser_id')).toBe(id);
     });
 
     it('should validate browser_id with async function', async () => {
@@ -70,8 +70,8 @@ describe('AsyncParticipant (Async)', () => {
             await new Promise(resolve => setTimeout(resolve, 10));
             return true;
         });
-        const participant = new AsyncParticipant('test_app', 'p', validationFunc);
-        const id = await participant.get_browser_id();
+        const browser = new AsyncBrowser('test_app', 'p', validationFunc);
+        const id = await browser.get_id();
         expect(validationFunc).toHaveBeenCalled();
         expect(id).toBeDefined();
     });
@@ -83,22 +83,22 @@ describe('AsyncParticipant (Async)', () => {
             attempts++;
             return attempts > 2;
         });
-        const participant = new AsyncParticipant('test_app', 'p', validationFunc);
-        const id = await participant.get_browser_id();
+        const browser = new AsyncBrowser('test_app', 'p', validationFunc);
+        const id = await browser.get_id();
         expect(validationFunc).toHaveBeenCalledTimes(3);
         expect(id).toBeDefined();
     });
 
     it('should set created_at and updated_at', async () => {
-        const participant = new AsyncParticipant('test_app');
-        const id = await participant.get_browser_id();
-        const createdAt = await participant.get_created_at();
+        const browser = new AsyncBrowser('test_app');
+        const id = await browser.get_id();
+        const createdAt = await browser.get_created_at();
         expect(createdAt).toBeDefined();
         
         // Simulate update
-        localStorage.removeItem('participants_id.browser_id');
-        const id2 = await participant.get_browser_id();
-        const updatedAt = await participant.get_updated_at();
+        localStorage.removeItem('browser_id.browser_id');
+        const id2 = await browser.get_id();
+        const updatedAt = await browser.get_updated_at();
         expect(updatedAt).toBeDefined();
     });
 });

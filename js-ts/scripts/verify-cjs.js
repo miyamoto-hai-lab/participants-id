@@ -1,4 +1,4 @@
-const { Participant, AsyncParticipant } = require('../dist/participants-id.js');
+const { Browser, AsyncBrowser } = require('../dist/browser-id.js');
 
 // Mock localStorage
 global.window = {
@@ -10,10 +10,10 @@ global.window = {
 };
 
 // Verify Sync
-const p = new Participant('test');
-console.log('Sync Browser ID:', p.browser_id);
+const b = new Browser('test');
+console.log('Sync Browser ID:', b.id);
 
-if (p.browser_id) {
+if (b.id) {
     console.log('CJS Sync Verification Passed');
 } else {
     console.error('CJS Sync Verification Failed');
@@ -22,8 +22,8 @@ if (p.browser_id) {
 
 // Verify Async
 (async () => {
-    const ap = new AsyncParticipant('test_async');
-    const id = await ap.get_browser_id();
+    const ab = new AsyncBrowser('test_async');
+    const id = await ab.get_id();
     console.log('Async Browser ID:', id);
 
     if (id) {

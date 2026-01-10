@@ -2,10 +2,10 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: {
-    'participants-id': 'src/participants-id.ts',
+    'browser-id': 'src/browser-id.ts',
   },
   format: ['cjs', 'esm', 'iife'],
-  globalName: 'ParticipantsIdLib',
+  globalName: 'BrowserIdLib',
   dts: true,
   clean: true,
 })

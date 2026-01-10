@@ -19,13 +19,13 @@ except ImportError:
 
 logger = getLogger(__name__)
 
-class Participant:
+class Browser:
     """
     Fletクライアントストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
     """
     MAX_RETRY_VALIDATION = 10  # ブラウザID検証の最大試行回数
 
-    def __init__(self, page: ft.Page, app_name: str, prefix: str = "participants_id", browser_id_validation_func: Optional[Callable[UUID, Union[bool, Awaitable[bool]]]] = None):
+    def __init__(self, page: ft.Page, app_name: str, prefix: str = "browser_id_lib", id_validation_func: Optional[Callable[UUID, Union[bool, Awaitable[bool]]]] = None):
         """
         :param page: 現在のFletアプリケーションのft.Pageオブジェクト
         :type page: flet.Page   
@@ -43,10 +43,10 @@ class Participant:
         self.storage = page.client_storage
         self.app_name = app_name
         self.prefix = prefix
-        self.browser_id_validation_func = browser_id_validation_func
+        self.id_validation_func = id_validation_func
     
     @property
-    async def browser_id(self) -> Optional[str]:
+    async def id(self) -> Optional[str]:
         """ブラウザIDを取得します。
 
         ブラウザIDがまだ存在しない時には新たに生成します。
@@ -54,7 +54,7 @@ class Participant:
         :return: 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はNone。
         :rtype: str | None
         """
-        return await self.get_browser_id()
+        return await self.get_id()
     
     @property
     async def created_at(self) -> Optional[str]:
@@ -75,15 +75,15 @@ class Participant:
         return await self.storage.get(f"{self.prefix}.updated_at")
     
     @property
-    async def browser_id_version(self) -> Optional[int]:
+    async def id_version(self) -> Optional[int]:
         """ブラウザIDのバージョンを取得します。
 
         :return: 保存されていたブラウザIDのバージョン。バージョンが保存されていない場合はNone。
         :rtype: int | None
         """
-        return UUID(await self.browser_id).version
+        return UUID(await self.id).version
     
-    async def _generate_browser_id(self) -> Optional[str]:
+    async def _generate_id(self) -> Optional[str]:
         """UUIDv7を(再)生成してbrowser_idに保存します。
 
         [注意!] browser_idを再生成すると他の実験プロジェクトに影響を及ぼす可能性があります。
@@ -95,8 +95,8 @@ class Participant:
         logger.info("Generating new browser ID...")
         for _ in range(self.MAX_RETRY_VALIDATION):
             new_id = str(uuid7())
-            if self.browser_id_validation_func:
-                is_valid = self.browser_id_validation_func(new_id)
+            if self.id_validation_func:
+                is_valid = self.id_validation_func(new_id)
                 if isawaitable(is_valid):
                     is_valid = await is_valid
             else:
@@ -119,7 +119,7 @@ class Participant:
                 logger.error("Failed to generate valid browser ID after maximum retries")
                 return None
 
-    async def get_browser_id(self) -> Optional[str]:
+    async def get_id(self) -> Optional[str]:
         """ブラウザIDを取得します。
 
         ブラウザIDがまだ存在しない時には新たに生成します。
@@ -134,9 +134,9 @@ class Participant:
             return id
         else:
             logger.info("Browser ID not found, generating new browser ID...")
-            return await self._generate_browser_id()
+            return await self._generate_id()
     
-    async def browser_id_exists(self) -> bool:
+    async def id_exists(self) -> bool:
         """ブラウザIDがストレージに存在するかを確認します。
         
         :return: ブラウザIDが存在する場合はTrue、それ以外はFalse
@@ -144,7 +144,7 @@ class Participant:
         """
         return await self.storage.contains_key(f"{self.prefix}.browser_id")
     
-    async def _delete_browser_id(self) -> bool:
+    async def _delete_id(self) -> bool:
         """ブラウザIDをストレージから削除します。
 
         [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。

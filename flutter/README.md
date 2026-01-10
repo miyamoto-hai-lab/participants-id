@@ -1,13 +1,16 @@
-# Flutter participants-id
+# Flutter browser-id
+
+**日本語** | [English](README_en.md)
+
 Flutter用のライブラリです。
 
 ## インストール
 `pubspec.yaml`に以下の内容を追加してください。
 ```yaml
 dependencies:
-  participants_id:
+  browser_id:
     git:
-      url: https://github.com/miyamoto-hai-lab/participants-id.git
+      url: https://github.com/miyamoto-hai-lab/browser-id.git
       path: flutter
 ```
 追加出来たら以下を実行します。
@@ -18,7 +21,7 @@ flutter pub get
 ## 使い方
 ```dart
 import 'package:flutter/material.dart';
-import 'package:participants_id/participants_id.dart';
+import 'package:browser_id/browser_id.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,8 +52,8 @@ class MyApp extends StatelessWidget {
 
   Future<String?> _getBrowserId() async {
     try {
-      final participant = Participant(appName: "my_experiment_app");
-      return await participant.browserId;
+      final browser = Browser(appName: "my_experiment_app");
+      return await browser.id;
     } catch (e) {
       debugPrint('Error getting browser ID: $e');
       return null;
@@ -58,17 +61,17 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
-まず最初にParticipantクラスのインスタンスを生成します。
+まず最初にBrowserIDクラスのインスタンスを生成します。
 実験アプリケーションの名前を引数として渡します。
 
 実験アプリケーションの名前は[attributesの保存](#被験者を識別するためのブラウザ固有のidを取得する)の際に使用されます。
 別の研究室メンバーの実験アプリケーションと区別するために、自身のニックネームを含めることを推奨します。
 
 ### 被験者を識別するためのブラウザ固有のIDを取得する
-各ブラウザで生成されたUUIDを取得するには、`browserId`プロパティを用います。
+各ブラウザで生成されたUUIDを取得するには、`id`プロパティを用います。
 ```dart
 try {
-  final browserId = await participant.browserId;
+  final browserId = await browser.id;
 } catch (e) {
   // エラーハンドリング
 }
@@ -81,8 +84,8 @@ try {
 このライブラリでは、ブラウザIDだけでなく、被験者のクラウドソーシングIDや年齢、性別など他の情報も保存・取得することができます。
 ```dart
 try {
-  await participant.setAttribute("cloudworker_id", "1234567890");
-  final cloudworkerId = await participant.getAttribute("cloudworker_id");
+  await browser.setAttribute("crowdworker_id", "1234567890");
+  final crowdworkerId = await browser.getAttribute("crowdworker_id");
 } catch (e) {
   // エラーハンドリング
 }

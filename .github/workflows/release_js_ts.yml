@@ -41,8 +41,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            js-ts/dist/participants-id.js
-            js-ts/dist/participants-id.mjs
-            js-ts/dist/participants-id.global.js
-            js-ts/dist/participants-id.d.ts
-            js-ts/dist/participants-id.d.mts
+            js-ts/dist/browser-id.js
+            js-ts/dist/browser-id.mjs
+            js-ts/dist/browser-id.global.js
+            js-ts/dist/browser-id.d.ts
+            js-ts/dist/browser-id.d.mts

@@ -89,42 +89,42 @@ function generate_uuidv7(): string {
     return `${tsHex.substring(0, 8)}-${tsHex.substring(8, 12)}-7${randA}-${variant}${randB_1}-${randB_2}`;
 }
 
-// --- Synchronous Participant ---
+// --- Synchronous Browser ---
 /**
  * ブラウザのローカルストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
  * (同期版)
  */
-export class Participant {
+export class Browser {
     private prefix: string;
     private app_name: string;
     private storage: Storage | null;
-    private browser_id_validation_func: ((id: string) => boolean) | null;
+    private id_validation_func: ((id: string) => boolean) | null;
     private MAX_RETRY_VALIDATION = 10; // ブラウザID検証の最大試行回数
     private debug: boolean;
     /**
      * @param app_name 実験アプリケーションの名前(attributesの保存に使用されます)
      * @param prefix 他のアプリと区別するためのストレージキーのプレフィックス (通常は指定する必要はありません。)
-     * @param browser_id_validation_func ブラウザIDの検証関数
+     * @param id_validation_func ブラウザIDの検証関数
      * (ブラウザIDを生成した後に保存前に呼び出されます。
      * UUIDを受け取り、受理可否をboolで返す同期関数を指定できます。)
      * @param debug trueにするとconsole.infoでINFOレベルのログを出力します。
      */
     constructor(
         app_name: string,
-        prefix: string = "participants_id",
-        browser_id_validation_func: ((id: string) => boolean) | null = null,
+        prefix: string = "browser_id_lib",
+        id_validation_func: ((id: string) => boolean) | null = null,
         debug: boolean = false
     ) {
         this.app_name = app_name;
         this.prefix = prefix;
-        this.browser_id_validation_func = browser_id_validation_func;
+        this.id_validation_func = id_validation_func;
         this.debug = debug;
 
         if (typeof window !== 'undefined' && window.localStorage) {
             this.storage = window.localStorage;
         } else {
             this.storage = null;
-            console.error("localStorage is not available. Participant will not persist data.");
+            console.error("Local storage is not available. Browser will not persist data.");
         }
     }
 
@@ -134,7 +134,7 @@ export class Participant {
      * 再生成は他のプロジェクト関係者に確認を取ってから慎重に行うことをお勧めします。
      * * @returns 新しく生成されたブラウザID。保存に失敗した場合はnull。
      */
-    private _generate_browser_id(): string | null {
+    private _generate_id(): string | null {
         if (this.debug) console.info("Generating new browser ID...");
 
         for (let i = 0; i < this.MAX_RETRY_VALIDATION; i++) {
@@ -147,8 +147,8 @@ export class Participant {
             }
 
             let isValid = true;
-            if (this.browser_id_validation_func) {
-                isValid = this.browser_id_validation_func(newId);
+            if (this.id_validation_func) {
+                isValid = this.id_validation_func(newId);
             }
 
             if (isValid) {
@@ -179,7 +179,7 @@ export class Participant {
      * * ブラウザIDがまだ存在しない時には新たに生成します。
      * * @returns 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はnull。
      */
-    public get browser_id(): string | null {
+    public get id(): string | null {
         if (this.debug) console.info("Getting browser ID...");
         const id = this.storage?.getItem(`${this.prefix}.browser_id`);
         if (id) {
@@ -187,7 +187,7 @@ export class Participant {
             return id;
         } else {
             if (this.debug) console.info("Browser ID not found, generating new ID...");
-            return this._generate_browser_id();
+            return this._generate_id();
         }
     }
 
@@ -213,8 +213,8 @@ export class Participant {
      * ブラウザIDのバージョンを取得します。
      * * @returns 保存されていたブラウザIDのバージョン。バージョンが保存されていない場合はnull。
      */
-    public get browser_id_version(): number | null {
-        const id = this.browser_id;
+    public get id_version(): number | null {
+        const id = this.id;
         if (!id) return null;
         if (!uuidValidate(id)) return null;
         return uuidVersion(id);
@@ -224,7 +224,7 @@ export class Participant {
      * ブラウザIDがストレージに存在するかを確認します。
      * * @returns ブラウザIDが存在する場合はTrue、それ以外はFalse
      */
-    public browser_id_exists(): boolean {
+    public id_exists(): boolean {
         if (!this.storage) return false;
         return this.storage.getItem(`${this.prefix}.browser_id`) !== null;
     }
@@ -234,7 +234,7 @@ export class Participant {
      * * [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。
      * 削除は特別な事情がない限り行わないでください。
      */
-    public delete_browser_id(): void {
+    public delete_id(): void {
         if (!this.storage) return;
         this.storage.removeItem(`${this.prefix}.browser_id`);
         this.storage.removeItem(`${this.prefix}.created_at`);
@@ -301,42 +301,42 @@ export class Participant {
     }
 }
 
-// --- Asynchronous Participant ---
+// --- Asynchronous Browser ---
 /**
  * ブラウザのローカルストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
  * (非同期版)
  */
-export class AsyncParticipant {
+export class AsyncBrowser {
     private prefix: string;
     private app_name: string;
     private storage: Storage | null;
-    private browser_id_validation_func: ((id: string) => boolean | Promise<boolean>) | null;
+    private id_validation_func: ((id: string) => boolean | Promise<boolean>) | null;
     private MAX_RETRY_VALIDATION = 10; // ブラウザID検証の最大試行回数
     private debug: boolean;
     /**
      * @param app_name 実験アプリケーションの名前(attributesの保存に使用されます)
      * @param prefix 他のアプリと区別するためのストレージキーのプレフィックス (通常は指定する必要はありません。)
-     * @param browser_id_validation_func ブラウザIDの検証関数
+     * @param id_validation_func ブラウザIDの検証関数
      * (ブラウザIDを生成した後に保存前に呼び出されます。
      * UUIDを受け取り、受理可否をboolで返す同期/非同期関数を指定できます。)
      * @param debug trueにするとconsole.infoでINFOレベルのログを出力します。
      */
     constructor(
         app_name: string,
-        prefix: string = "participants_id",
-        browser_id_validation_func: ((id: string) => boolean | Promise<boolean>) | null = null,
+        prefix: string = "browser_id_lib",
+        id_validation_func: ((id: string) => boolean | Promise<boolean>) | null = null,
         debug: boolean = false
     ) {
         this.app_name = app_name;
         this.prefix = prefix;
-        this.browser_id_validation_func = browser_id_validation_func;
+        this.id_validation_func = id_validation_func;
         this.debug = debug;
 
         if (typeof window !== 'undefined' && window.localStorage) {
             this.storage = window.localStorage;
         } else {
             this.storage = null;
-            console.error("localStorage is not available. AsyncParticipant will not persist data.");
+            console.error("localStorage is not available. AsyncBrowser will not persist data.");
         }
     }
 
@@ -346,7 +346,7 @@ export class AsyncParticipant {
      * 再生成は他のプロジェクト関係者に確認を取ってから慎重に行うことをお勧めします。
      * * @returns 新しく生成されたブラウザID。保存に失敗した場合はnull。
      */
-    private async _generate_browser_id(): Promise<string | null> {
+    private async _generate_id(): Promise<string | null> {
         if (this.debug) console.info("Generating new browser ID...");
 
         for (let i = 0; i < this.MAX_RETRY_VALIDATION; i++) {
@@ -359,8 +359,8 @@ export class AsyncParticipant {
             }
 
             let isValid = true;
-            if (this.browser_id_validation_func) {
-                isValid = await this.browser_id_validation_func(newId);
+            if (this.id_validation_func) {
+                isValid = await this.id_validation_func(newId);
             }
 
             if (isValid) {
@@ -391,7 +391,7 @@ export class AsyncParticipant {
      * * ブラウザIDがまだ存在しない時には新たに生成します。
      * * @returns 保存されていたブラウザID、または生成された新しいブラウザID。生成に失敗した場合はnull。
      */
-    public async get_browser_id(): Promise<string | null> {
+    public async get_id(): Promise<string | null> {
         if (this.debug) console.info("Getting browser ID...");
         const id = this.storage?.getItem(`${this.prefix}.browser_id`);
         if (id) {
@@ -399,7 +399,7 @@ export class AsyncParticipant {
             return id;
         } else {
             if (this.debug) console.info("Browser ID not found, generating new ID...");
-            return await this._generate_browser_id();
+            return await this._generate_id();
         }
     }
 
@@ -425,8 +425,8 @@ export class AsyncParticipant {
      * ブラウザIDのバージョンを取得します。
      * * @returns 保存されていたブラウザIDのバージョン。バージョンが保存されていない場合はnull。
      */
-    public async get_browser_id_version(): Promise<number | null> {
-        const id = await this.get_browser_id();
+    public async get_id_version(): Promise<number | null> {
+        const id = await this.get_id();
         if (!id) return null;
         if (!uuidValidate(id)) return null;
         return uuidVersion(id);
@@ -436,7 +436,7 @@ export class AsyncParticipant {
      * ブラウザIDがストレージに存在するかを確認します。
      * * @returns ブラウザIDが存在する場合はTrue、それ以外はFalse
      */
-    public async browser_id_exists(): Promise<boolean> {
+    public async id_exists(): Promise<boolean> {
         if (!this.storage) return false;
         return this.storage.getItem(`${this.prefix}.browser_id`) !== null;
     }
@@ -446,7 +446,7 @@ export class AsyncParticipant {
      * * [注意!] browser_idを削除すると他の実験プロジェクトに影響を及ぼす可能性が高いです。
      * 削除は特別な事情がない限り行わないでください。
      */
-    public async delete_browser_id(): Promise<void> {
+    public async delete_id(): Promise<void> {
         if (!this.storage) return;
         this.storage.removeItem(`${this.prefix}.browser_id`);
         this.storage.removeItem(`${this.prefix}.created_at`);

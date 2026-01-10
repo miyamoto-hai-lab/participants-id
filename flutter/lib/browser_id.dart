@@ -3,27 +3,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:logging/logging.dart';
 
-final _log = Logger('participants_id');
+final _log = Logger('browser_id_lib');
 
 /// Fletクライアントストレージを使用してUUIDv7を保存・取得・管理するライブラリです。
-class Participant {
+class Browser {
   static const int MAX_RETRY_VALIDATION = 10; // ブラウザID検証の最大試行回数
 
   final String appName;
   final String prefix;
-  final Future<bool> Function(String)? browserIdValidationFunc;
+  final Future<bool> Function(String)? idValidationFunc;
   final Uuid _uuid = const Uuid();
 
   /// [appName] 実験アプリケーションの名前(attributesの保存に使用されます)
   /// [prefix] 他のアプリと区別するためのストレージキーのプレフィックス (通常は指定する必要はありません。)
-  /// [browserIdValidationFunc] ブラウザIDの検証関数
+  /// [idValidationFunc] ブラウザIDの検証関数
   /// (ブラウザIDを生成した後に保存前に呼び出されます。
   /// サーバに生成されたIDの登録可否を問い合わせる用途で使用できます。)
   /// (UUIDを受け取り、受理可否をboolで返す非同期関数を指定できます。)
-  Participant({
+  Browser({
     required this.appName,
-    this.prefix = "participants_id",
-    this.browserIdValidationFunc,
+    this.prefix = "browser_id_lib",
+    this.idValidationFunc,
   });
 
   /// UUIDv7を(再)生成してbrowser_idに保存します。
@@ -33,7 +33,7 @@ class Participant {
   ///
   /// Returns: 新しく生成されたブラウザID。
   /// Throws: [Exception] 保存に失敗した場合、または検証に失敗し続けた場合。
-  Future<String> _generateBrowserId() async {
+  Future<String> _generateId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       
@@ -41,8 +41,8 @@ class Participant {
         final newId = _uuid.v7();
         
         bool isValid = true;
-        if (browserIdValidationFunc != null) {
-          isValid = await browserIdValidationFunc!(newId);
+        if (idValidationFunc != null) {
+          isValid = await idValidationFunc!(newId);
         }
 
         if (isValid) {
@@ -76,8 +76,8 @@ class Participant {
   ///
   /// Returns: 保存されていたブラウザID、または生成された新しいブラウザID。
   /// Throws: [Exception] 取得または生成に失敗した場合。
-  Future<String> get browserId async {
-    final id = await getBrowserId();
+  Future<String> get id async {
+    final id = await getId();
     if (id.isEmpty) {
       // This should only happen if generateIfNotExists is false, but here it is true by default.
       // Or if _generateBrowserId failed but didn't throw (which is not the case).
@@ -92,7 +92,7 @@ class Participant {
   ///
   /// Returns: 保存されていたブラウザID、または生成された新しいブラウザID。
   /// Throws: [Exception] 取得または生成に失敗した場合。
-  Future<String> getBrowserId() async {
+  Future<String> getId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final id = prefs.getString('$prefix.browser_id');
@@ -101,7 +101,7 @@ class Participant {
         return id;
       } else {
         _log.info("Browser ID not found, generating new ID...");
-        return await _generateBrowserId();
+        return await _generateId();
       }
     } catch (e) {
       throw Exception('Failed to get browser_id: $e');
@@ -135,7 +135,7 @@ class Participant {
   /// ブラウザIDがストレージに存在するかを確認します。
   /// 
   /// Returns: ブラウザIDが存在する場合はTrue、それ以外はFalse
-  Future<bool> browserIdExists() async {
+  Future<bool> idExists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.containsKey('$prefix.browser_id');
@@ -150,7 +150,7 @@ class Participant {
   /// 削除は特別な事情がない限り行わないでください。
   ///
   /// Throws: [Exception] 削除に失敗した場合。
-  Future<void> deleteBrowserId() async {
+  Future<void> deleteId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final success = await prefs.remove('$prefix.browser_id');
